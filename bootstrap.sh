@@ -8,7 +8,9 @@ wget https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 pip install psutil
 pip install pyyaml
+pip install requests
 pip install rq
+
 
 wget http://download.redis.io/releases/redis-stable.tar.gz
 tar xzf redis-stable.tar.gz
