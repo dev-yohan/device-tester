@@ -1,0 +1,3 @@
+iot_manager:
+  url: http://iot-data-manager.herokuapp.com
+  token: 12e3caa45dd24b7783ffab82ec8cf706

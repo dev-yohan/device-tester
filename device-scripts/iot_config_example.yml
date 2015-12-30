@@ -1,0 +1,3 @@
+iot_manager:
+  url: http://iot-data-manager.example.com
+  token: please-change-me
