@@ -10,7 +10,7 @@ pip install psutil
 pip install pyyaml
 pip install requests
 pip install rq
-
+pip install paho-mqtt
 
 wget http://download.redis.io/releases/redis-stable.tar.gz
 tar xzf redis-stable.tar.gz
