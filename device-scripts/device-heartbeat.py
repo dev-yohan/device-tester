@@ -1,21 +1,61 @@
 import time
-import os
-from rq import Queue
-import redis
-from util import count_words_at_url
+import os, urlparse
+import json
+import yaml
+import psutil
+import paho.mqtt.client as paho
 
-#redis_conn = Redis()
-redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+# Define event callbacks
+def on_connect(mosq, obj, rc):
+    print("rc: " + str(rc))
 
-redis_conn = redis.from_url(redis_url)
+def on_message(mosq, obj, msg):
+    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
 
-q = Queue(connection=redis_conn)  # no args implies the default queue
+def on_publish(mosq, obj, mid):
+    print("mid: " + str(mid))
 
-# Delay execution of count_words_at_url('http://nvie.com')
+def on_subscribe(mosq, obj, mid, granted_qos):
+    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+
+def on_log(mosq, obj, level, string):
+    print(string)
+
+mqttc = paho.Client()
+# Assign event callbacks
+mqttc.on_message = on_message
+mqttc.on_connect = on_connect
+mqttc.on_publish = on_publish
+mqttc.on_subscribe = on_subscribe    
+
+with open('iot_config.yml','r') as f:
+    config = yaml.load(f)
+
+print config['mqtt_server']
+
+#url = config['mqtt_server']['url']
+url_str = config['mqtt_server']['url']+':'+str(config['mqtt_server']['port'])
+parsed_url = urlparse.urlparse(url_str)
+port = config['mqtt_server']['port']
+username = config['mqtt_server']['username']
+password = config['mqtt_server']['password']
+channel = 'iot/heartbeat_1'
+
+mqttc.username_pw_set(username, password)
+
+#mqttc.connect(url, int(port))
+mqttc.connect(parsed_url.hostname, parsed_url.port)
+
+# Start subscribe, with QoS level 0
+mqttc.subscribe(channel, 0)
+
 while True:
-    job = q.enqueue(count_words_at_url, 'http://www.eltiempo.com')
-    print job.result   # => None
+    #print psutil.cpu_times()[0]
+    data = {"timestamp": int(time.time()),
+      "user_cpu": str(psutil.cpu_times()[0])  
+    }
+    mqttc.publish(channel, json.dumps(data))
+    time.sleep(1)
 
-    # Now, wait a while, until the worker is finished
-    time.sleep(2)
-    print job.result   # => 889
+
+
