@@ -3,30 +3,9 @@ import os, urlparse
 import json
 import yaml
 import psutil
-import paho.mqtt.client as paho
+from mqtt_util import *
 
-# Define event callbacks
-def on_connect(mosq, obj, rc):
-    print("rc: " + str(rc))
-
-def on_message(mosq, obj, msg):
-    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
-
-def on_publish(mosq, obj, mid):
-    print("mid: " + str(mid))
-
-def on_subscribe(mosq, obj, mid, granted_qos):
-    print("Subscribed: " + str(mid) + " " + str(granted_qos))
-
-def on_log(mosq, obj, level, string):
-    print(string)
-
-mqttc = paho.Client()
-# Assign event callbacks
-mqttc.on_message = on_message
-mqttc.on_connect = on_connect
-mqttc.on_publish = on_publish
-mqttc.on_subscribe = on_subscribe   
+mqttc = create_mqtt_client()
 
 with open('.device_id', 'r') as f:
     device_id = f.readline() 
@@ -46,7 +25,6 @@ channel = 'iot/heartbeat_' + device_id
 
 mqttc.username_pw_set(username, password)
 
-#mqttc.connect(url, int(port))
 mqttc.connect(parsed_url.hostname, parsed_url.port)
 
 # Start subscribe, with QoS level 0
