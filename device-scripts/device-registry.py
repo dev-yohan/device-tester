@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import yaml
 import uuid
+import json
 
 def getserial(name):
   # Extract serial from cpuinfo file
@@ -34,4 +35,11 @@ headers = {'Authorization':'Token token='+config['iot_manager']['token']}
 data = urllib.urlencode(values)
 req = urllib2.Request(url,data,headers)
 response = urllib2.urlopen(req)
-print response.read()
+
+json_response = json.loads(response.read())
+
+target = open('.device_id', 'w')
+
+target.write(str(json_response['response_body']['device']['id']))
+
+print json_response['response_body']['device']['id']

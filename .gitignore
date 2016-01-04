@@ -1,2 +1,3 @@
 # Ignore IoT credentials
 device-scripts/iot_config.yml
+device-scripts/.device_id
