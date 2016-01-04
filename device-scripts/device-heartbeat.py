@@ -26,7 +26,10 @@ mqttc = paho.Client()
 mqttc.on_message = on_message
 mqttc.on_connect = on_connect
 mqttc.on_publish = on_publish
-mqttc.on_subscribe = on_subscribe    
+mqttc.on_subscribe = on_subscribe   
+
+with open('.device_id', 'r') as f:
+    device_id = f.readline() 
 
 with open('iot_config.yml','r') as f:
     config = yaml.load(f)
@@ -39,7 +42,7 @@ parsed_url = urlparse.urlparse(url_str)
 port = config['mqtt_server']['port']
 username = config['mqtt_server']['username']
 password = config['mqtt_server']['password']
-channel = 'iot/heartbeat_1'
+channel = 'iot/heartbeat_' + device_id
 
 mqttc.username_pw_set(username, password)
 

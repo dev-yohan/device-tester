@@ -39,7 +39,7 @@ response = urllib2.urlopen(req)
 json_response = json.loads(response.read())
 
 target = open('.device_id', 'w')
-
 target.write(str(json_response['response_body']['device']['id']))
+target.close()
 
 print json_response['response_body']['device']['id']
